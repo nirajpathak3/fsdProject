@@ -2,6 +2,7 @@ const express = require('express')
 const axios = require('axios');
 const cors = require('cors');
 const users = require('./src/users');
+const posts = require('./src/posts');
 
 require('dotenv').config()
 const app = express();
@@ -10,7 +11,7 @@ app.use(cors());
 
 /// Logger Middleware is defined here
 const loggerMiddleware = (req, res, next) =>{
-  console.log("Hello...");
+  console.log(`${req.method}`);
   next();
 }
 app.use(loggerMiddleware);
@@ -21,6 +22,8 @@ app.get('/', function (req, res) {
 })
 
 app.get('/api/users', loggerMiddleware, users.getUsers); // using to get all users
+
+app.get('/api/posts', loggerMiddleware, posts.getPosts); // using to get all users
 
 //// Server is started here
 app.listen(process.env.port, ()=>{
