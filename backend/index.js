@@ -29,6 +29,28 @@ connectMongoDB()
       const userdata = await users.getUsers(db);
       res.json(userdata);
     });
+    app.get('/api/users/:id', async (req, res) => {
+      console.log(req.params.id);
+      const userdata = await users.getUserById(db, req.params.id);
+      res.json(userdata);
+    });
+
+    app.post('/api/user', async (req, res) => {
+      try {
+        const userdata = await users.createUser(db, req.body);
+        res.status(201).json({ message: 'User created successfully.' });
+      } catch (error) {
+        res.json({message: error.message, })
+      }      
+    });
+    app.post('/api/user/:id', async (req, res) => {
+      try {
+        const userdata = await users.updateUser(db, req.params.id, req.body);
+        res.status(200).json({ message: 'User updated successfully.' });
+      } catch (error) {
+        res.json({message: error.message, })
+      }      
+    });
 
     app.listen(process.env.PORT || 3000, () => {
       console.log("Listening port...", process.env.PORT || 3000)

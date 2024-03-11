@@ -1,4 +1,4 @@
-const { objectId } = require('./mongo');
+const { ObjectId } = require('./mongo');
 
 async function getUsers(db) {
     try {
@@ -13,7 +13,7 @@ async function getUsers(db) {
 
 async function getUserById(db, userId) {
     try {
-        const user = await db.collection('users').findOne({ _id: ObjectId(userId) });
+        const user = await db.collection('users').findOne({_id: new ObjectId(userId) });
         return user;
     } catch (error) {
         console.error('Error fetching user by ID:', error);
@@ -21,4 +21,37 @@ async function getUserById(db, userId) {
     }
 }
 
-module.exports = { getUsers, getUserById }
+async function createUser(db, userData) {
+    try {
+        const result = await db.collection('users').insertOne(userData);
+        return result.insertedId;
+    } catch (error) {
+        console.error('Error creating user:', error);
+        throw error;
+    }
+}
+
+async function updateUser(db, userId, updatedUserData) {
+    try {
+        const result = await db.collection('users').updateOne(
+            { _id: ObjectId(userId) },
+            { $set: updatedUserData }
+        );
+        return result.modifiedCount;
+    } catch (error) {
+        console.error('Error updating user:', error);
+        throw error;
+    }
+}
+
+async function deleteUser(db, userId) {
+    try {
+        const result = await db.collection('users').deleteOne({ _id: ObjectId(userId) });
+        return result.deletedCount;
+    } catch (error) {
+        console.error('Error deleting user:', error);
+        throw error;
+    }
+}
+
+module.exports = { getUsers, getUserById, createUser, updateUser, deleteUser };
