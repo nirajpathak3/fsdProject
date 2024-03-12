@@ -1,36 +1,35 @@
-// backend/index.js
 const express = require('express');
-const mongoose = require('mongoose');
-const { register, login, authenticateToken } = require('./src/auth/auth');
-const User = require('./src/models/User');
-
-require('dotenv').config();
-
 const app = express();
-app.use(express.json());
+const http = require('http').createServer(app);
+const { Server } = require('socket.io'); // Using socket.io for convenience
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI)
-    .then(() => {
-        console.log('Connected to MongoDB');
-    })
-    .catch(error => {
-        console.error('Error connecting to MongoDB:', error);
-    });
+const io = new Server(http);
 
-// Routes
-app.post('/api/register', register);
-app.post('/api/login', login);
+app.use(express.static('public')); // Serve static files from the 'public' directory
 
-app.get('/api/profile', authenticateToken, async (req, res) => {
-    try {
-        const user = await User.findOne({ username: req.user.username });
-        res.json(user);
-    } catch (error) {
-        res.status(500).json({ message: 'Internal server error' });
-    }
+const users = {}; // Store connected users and their usernames
+
+io.on('connection', (socket) => {
+  console.log('A user connected!');
+
+  socket.on('join', (username) => {
+    users[socket.id] = username;
+    socket.broadcast.emit('userJoined', username); // Broadcast to all except sender
+    io.emit('usersList', Object.values(users)); // Send current user list to all
+  });
+
+  socket.on('chat message', (msg) => {
+    const username = users[socket.id];
+    io.emit('chat message', { username, msg }); // Broadcast message to all
+  });
+
+  socket.on('disconnect', () => {
+    const username = users[socket.id];
+    delete users[socket.id];
+    io.emit('userLeft', username); // Broadcast user leaving
+  });
 });
 
-app.listen(process.env.PORT || 3000, () => {
-    console.log('Server started');
+http.listen(3000, () => {
+  console.log('Server listening on port 3000');
 });

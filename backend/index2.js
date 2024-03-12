@@ -28,7 +28,7 @@ app.post('/api/login', login);
 app.get('/api/profile', authenticateToken, async (req, res) => {
     try {
         const user = await User.findOne({ username: req.user.username });
-        res.json(user);
+        res.status(200).json({username:user.username, userId:user._id});
     } catch (error) {
         res.status(500).json({ message: 'Internal server error' });
     }
