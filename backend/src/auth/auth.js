@@ -24,7 +24,7 @@ async function login(req, res, next) {
         }
         if (await bcrypt.compare(password, user.password)) {
             const token = generateToken(user);
-            res.json({ user, token });
+            res.json({token });
         } else {
             res.status(401).json({ message: 'Invalid password' });
         }
@@ -34,7 +34,7 @@ async function login(req, res, next) {
 }
 
 function generateToken(user) {
-    return jwt.sign({ username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    return jwt.sign({ username: user.username }, "ORGCGS$@AS22213123", { expiresIn: '1h' });
 }
 
 function authenticateToken(req, res, next) {

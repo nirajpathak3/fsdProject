@@ -3,14 +3,11 @@ const express = require('express');
 const mongoose = require('mongoose');
 const { register, login, authenticateToken } = require('./src/auth/auth');
 const User = require('./src/models/User');
-const multer = require('multer');
 
 require('dotenv').config();
 
 const app = express();
 app.use(express.json());
-
-const upload = multer({ dest: 'uploads/' });
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI)
@@ -32,11 +29,6 @@ app.get('/api/profile', authenticateToken, async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: 'Internal server error' });
     }
-});
-
-app.post('/api/upload', upload.single('avatar'), (req, res) => {
-    console.log('File uploaded:', req.avatar);
-    res.send('File uploaded successfully');
 });
 
 app.listen(process.env.PORT || 3000, () => {
