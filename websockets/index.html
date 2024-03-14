@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebSocket Chat</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.0/socket.io.js"></script>
+</head>
+<body>
+  <h1>WebSocket Chat</h1>
+  <input type="text" id="message" placeholder="Enter message">
+  <button id="send-btn">Send</button>
+  <ul id="messages"></ul>
+  <script>
+    const socket = io(); // Connect to the server
+
+    const messageInput = document.getElementById('message');
+    const sendButton = document.getElementById('send-btn');
+    const messagesList = document.getElementById('messages');
+
+    sendButton.addEventListener('click', () => {
+      const message = messageInput.value;
+      socket.emit('message', message); // Send message to server
+      messageInput.value = '';
+    });
+
+    socket.on('message-broadcast', (msg) => { // Receive broadcasted messages
+      const newMessage = document.createElement('li');
+      newMessage.textContent = msg;
+      messagesList.appendChild(newMessage);
+    });
+  </script>
+</body>
+</html>
