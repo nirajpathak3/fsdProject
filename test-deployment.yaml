@@ -1,0 +1,12 @@
+# test-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-app
+spec:
+  template:
+    spec:
+      containers:
+        - name: test-app
+          image: nginx:latest
+          # Missing: securityContext.allowPrivilegeEscalation: false
